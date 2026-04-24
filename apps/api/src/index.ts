@@ -14,6 +14,8 @@ import './workers/extract.worker';
 import './workers/build-cv.worker';
 import './workers/process-video.worker';
 
+import path from 'path';
+
 const app = express();
 
 app.use(cors({ origin: '*' }));
@@ -29,7 +31,7 @@ app.use('/profiles', profilesRouter);
 app.use('/search', searchRouter);
 
 // Serve test UI (must be after API routes)
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')));
 
 const PORT = Number(process.env.PORT ?? 3001);
 const httpServer = http.createServer(app);
