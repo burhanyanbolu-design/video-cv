@@ -16,8 +16,9 @@ import './workers/process-video.worker';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use(express.static('public'));
 
 // Health check
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
