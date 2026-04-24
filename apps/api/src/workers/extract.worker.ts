@@ -67,18 +67,13 @@ export const extractWorker = new Worker(
     const raw = completion.choices[0]?.message?.content ?? '{}';
     const cvData: CvData = JSON.parse(raw);
 
-    // Validate required fields
-    const missingFields: string[] = [];
-    if (!cvData.name) missingFields.push('name');
-    if (!cvData.work_experience?.length) missingFields.push('work_experience');
-
-    if (missingFields.length > 0) {
+    // Validate required fields - only name is strictly required
+    if (!cvData.name) {
       await db.query(`UPDATE sessions SET status = 'error' WHERE id = $1`, [sessionId]);
       emitToUser(userId, {
         event: 'pipeline:error',
         stage: 'extract',
-        message: `Missing required fields: ${missingFields.join(', ')}`,
-        missingFields,
+        message: 'Could not extract name from video',
       });
       return;
     }
