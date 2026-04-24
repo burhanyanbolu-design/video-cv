@@ -70,9 +70,12 @@
         // Check API status
         async function checkStatus() {
             try {
-                const res = await fetch(`${API_URL}/auth/login`, { method: 'OPTIONS' });
-                document.getElementById('status').innerHTML = '<strong>API Status:</strong> ✅ Running on port 3002';
-                document.getElementById('status').className = 'status success';
+                const res = await fetch(`${API_URL}/health`);
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    document.getElementById('status').innerHTML = '<strong>API Status:</strong> ✅ Running';
+                    document.getElementById('status').className = 'status success';
+                }
             } catch (err) {
                 document.getElementById('status').innerHTML = '<strong>API Status:</strong> ❌ Not running. Start with: npm run dev';
                 document.getElementById('status').className = 'status error';
