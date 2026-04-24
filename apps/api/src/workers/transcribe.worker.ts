@@ -1,5 +1,5 @@
 import { Worker, Job } from 'bullmq';
-import OpenAI from 'openai';
+import OpenAI, { toFile } from 'openai';
 import { redisConnection } from '../queues/redis-connection';
 import { cleanQueue } from '../queues';
 import { db } from '../db/client';
@@ -41,8 +41,7 @@ export const transcribeWorker = new Worker(
     const videoBuffer = await downloadFromS3(rows[0].raw_video_url);
 
     // Call Whisper with verbose_json for word-level timestamps
-    const uint8Array = new Uint8Array(videoBuffer);
-    const file = new File([uint8Array], 'audio.mp4', { type: 'video/mp4' });
+    const file = await toFile(videoBuffer, 'audio.mp4', { type: 'video/mp4' });
     const transcription = await openai.audio.transcriptions.create({
       file,
       model: 'whisper-1',
