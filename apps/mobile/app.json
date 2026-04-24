@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Video CV",
+    "slug": "video-cv",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.videocv.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Video CV needs camera access to record your video CV.",
+        "NSMicrophoneUsageDescription": "Video CV needs microphone access to record audio for your video CV."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.videocv.app",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Video CV needs camera access to record your video CV.",
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "Video CV needs microphone access to record audio."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ffffff"
+        }
+      ]
+    ]
+  }
+}

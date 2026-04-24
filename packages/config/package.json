@@ -1,0 +1,21 @@
+{
+  "name": "@video-cv/config",
+  "version": "0.1.0",
+  "description": "Shared ESLint, Prettier, and TypeScript base configs for Video CV",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./eslint": "./eslint.js",
+    "./prettier": "./prettier.js"
+  },
+  "scripts": {
+    "lint": "echo 'No lint step for config package'",
+    "build": "echo 'No build step for config package'"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "eslint": "^8.57.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "prettier": "^3.2.0"
+  }
+}

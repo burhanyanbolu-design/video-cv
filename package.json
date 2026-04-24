@@ -1,0 +1,40 @@
+{
+  "name": "video-cv",
+  "version": "1.0.0",
+  "description": "Video CV monorepo — turn a spoken recording into a cleaned video and formatted CV",
+  "private": true,
+  "packageManager": "npm@9.0.0",
+  "workspaces": [
+    "apps/api",
+    "apps/web",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "dev": "turbo run dev",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+  },
+  "devDependencies": {
+    "@swc/core": "^1.15.30",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "overrides": {
+    "@video-cv/mobile": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0"
+    }
+  }
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video CV - Test App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 30px; }
+        .section { margin-bottom: 30px; padding: 20px; background: #f9f9f9; border-radius: 5px; }
+        h2 { color: #555; margin-bottom: 15px; font-size: 18px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { background: #0070f3; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0051cc; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .response { margin-top: 15px; padding: 15px; background: #e8f5e9; border-left: 4px solid #4caf50; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+        .error { background: #ffebee; border-left-color: #f44336; }
+        .status { padding: 10px; margin: 10px 0; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; }
+        .success { background: #d4edda; border-left-color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Video CV - API Test</h1>
+        
+        <div class="status" id="status">
+            <strong>API Status:</strong> Checking...
+        </div>
+
+        <!-- Register -->
+        <div class="section">
+            <h2>1. Register Account</h2>
+            <input type="email" id="regEmail" placeholder="Email" value="test@example.com">
+            <input type="password" id="regPassword" placeholder="Password" value="password123">
+            <button onclick="register()">Register</button>
+            <div id="regResponse"></div>
+        </div>
+
+        <!-- Login -->
+        <div class="section">
+            <h2>2. Login</h2>
+            <input type="email" id="loginEmail" placeholder="Email" value="test@example.com">
+            <input type="password" id="loginPassword" placeholder="Password" value="password123">
+            <button onclick="login()">Login</button>
+            <div id="loginResponse"></div>
+        </div>
+
+        <!-- Upload Video -->
+        <div class="section">
+            <h2>3. Upload Video (Need to login first)</h2>
+            <input type="file" id="videoFile" accept="video/*">
+            <button onclick="uploadVideo()" id="uploadBtn" disabled>Upload Video</button>
+            <div id="uploadResponse"></div>
+        </div>
+
+        <!-- List Sessions -->
+        <div class="section">
+            <h2>4. My Sessions</h2>
+            <button onclick="getSessions()" id="sessionsBtn" disabled>Get My Sessions</button>
+            <div id="sessionsResponse"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3002';
+        let token = null;
+
+        // Check API status
+        async function checkStatus() {
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, { method: 'OPTIONS' });
+                document.getElementById('status').innerHTML = '<strong>API Status:</strong> ✅ Running on port 3002';
+                document.getElementById('status').className = 'status success';
+            } catch (err) {
+                document.getElementById('status').innerHTML = '<strong>API Status:</strong> ❌ Not running. Start with: npm run dev';
+                document.getElementById('status').className = 'status error';
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, privacyPolicyVersion: '1.0' })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    token = data.token;
+                    document.getElementById('regResponse').className = 'response';
+                    document.getElementById('regResponse').textContent = `✅ Registered!\nToken: ${token.substring(0, 50)}...\nUser ID: ${data.userId}`;
+                    enableButtons();
+                } else {
+                    document.getElementById('regResponse').className = 'response error';
+                    document.getElementById('regResponse').textContent = `❌ Error: ${data.error || JSON.stringify(data)}`;
+                }
+            } catch (err) {
+                document.getElementById('regResponse').className = 'response error';
+                document.getElementById('regResponse').textContent = `❌ Error: ${err.message}`;
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    token = data.token;
+                    document.getElementById('loginResponse').className = 'response';
+                    document.getElementById('loginResponse').textContent = `✅ Logged in!\nToken: ${token.substring(0, 50)}...\nUser ID: ${data.userId}`;
+                    enableButtons();
+                } else {
+                    document.getElementById('loginResponse').className = 'response error';
+                    document.getElementById('loginResponse').textContent = `❌ Error: ${data.error || JSON.stringify(data)}`;
+                }
+            } catch (err) {
+                document.getElementById('loginResponse').className = 'response error';
+                document.getElementById('loginResponse').textContent = `❌ Error: ${err.message}`;
+            }
+        }
+
+        async function uploadVideo() {
+            const fileInput = document.getElementById('videoFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a video file');
+                return;
+            }
+            
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('video', file);
+            
+            try {
+                document.getElementById('uploadResponse').className = 'response';
+                document.getElementById('uploadResponse').textContent = '⏳ Uploading video...';
+                
+                const res = await fetch(`${API_URL}/sessions`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('uploadResponse').className = 'response';
+                    document.getElementById('uploadResponse').textContent = `✅ Video uploaded!\nSession ID: ${data.sessionId}\nStatus: ${data.status}\n\nThe video is now being processed:\n1. Transcribing with OpenAI Whisper\n2. Cleaning transcript\n3. Extracting CV data with GPT\n4. Generating PDF\n5. Processing video`;
+                } else {
+                    document.getElementById('uploadResponse').className = 'response error';
+                    document.getElementById('uploadResponse').textContent = `❌ Error: ${data.error || JSON.stringify(data)}`;
+                }
+            } catch (err) {
+                document.getElementById('uploadResponse').className = 'response error';
+                document.getElementById('uploadResponse').textContent = `❌ Error: ${err.message}`;
+            }
+        }
+
+        async function getSessions() {
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/sessions`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok) {
+                    document.getElementById('sessionsResponse').className = 'response';
+                    document.getElementById('sessionsResponse').textContent = `✅ Sessions:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    document.getElementById('sessionsResponse').className = 'response error';
+                    document.getElementById('sessionsResponse').textContent = `❌ Error: ${data.error || JSON.stringify(data)}`;
+                }
+            } catch (err) {
+                document.getElementById('sessionsResponse').className = 'response error';
+                document.getElementById('sessionsResponse').textContent = `❌ Error: ${err.message}`;
+            }
+        }
+
+        function enableButtons() {
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('sessionsBtn').disabled = false;
+        }
+
+        // Check status on load
+        checkStatus();
+    </script>
+</body>
+</html>

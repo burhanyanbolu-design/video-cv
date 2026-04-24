@@ -1,0 +1,30 @@
+{
+  "name": "@video-cv/api-client",
+  "version": "0.1.0",
+  "description": "Typed fetch wrapper for the Video CV API — used by web and mobile apps",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest --runInBand",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@video-cv/types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@video-cv/config": "*",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0",
+    "ts-jest": "^29.0.0"
+  }
+}
