@@ -18,7 +18,6 @@ const app = express();
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
-app.use(express.static('public'));
 
 // Health check
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
@@ -28,6 +27,9 @@ app.use('/auth', authRouter);
 app.use('/sessions', sessionsRouter);
 app.use('/profiles', profilesRouter);
 app.use('/search', searchRouter);
+
+// Serve test UI (must be after API routes)
+app.use(express.static('public'));
 
 const PORT = Number(process.env.PORT ?? 3001);
 const httpServer = http.createServer(app);
